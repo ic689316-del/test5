@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>제주 카페 많은 동네 TOP 21</title>
+<style>
+  .viz-root {
+    --surface-1:      #fcfcfb;
+    --page:           #f9f9f7;
+    --text-primary:   #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted:     #898781;
+    --gridline:       #e1e0d9;
+    --baseline:       #c3c2b7;
+    --border:         rgba(11,11,11,0.10);
+    --series-1:       #2a78d6;
+    --series-1-wash:  #cde2fb;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    .viz-root {
+      --surface-1:      #1a1a19;
+      --page:           #0d0d0d;
+      --text-primary:   #ffffff;
+      --text-secondary: #c3c2b7;
+      --text-muted:     #898781;
+      --gridline:       #2c2c2a;
+      --baseline:       #383835;
+      --border:         rgba(255,255,255,0.10);
+      --series-1:       #3987e5;
+      --series-1-wash:  #184f95;
+    }
+  }
+  :root[data-theme="dark"] .viz-root {
+    --surface-1:      #1a1a19;
+    --page:           #0d0d0d;
+    --text-primary:   #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted:     #898781;
+    --gridline:       #2c2c2a;
+    --baseline:       #383835;
+    --border:         rgba(255,255,255,0.10);
+    --series-1:       #3987e5;
+    --series-1-wash:  #184f95;
+  }
+  :root[data-theme="light"] .viz-root {
+    --surface-1:      #fcfcfb;
+    --page:           #f9f9f7;
+    --text-primary:   #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted:     #898781;
+    --gridline:       #e1e0d9;
+    --baseline:       #c3c2b7;
+    --border:         rgba(11,11,11,0.10);
+    --series-1:       #2a78d6;
+    --series-1-wash:  #cde2fb;
+  }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); }
+
+  .viz-root {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 28px 28px 20px;
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+
+  .viz-header { margin-bottom: 4px; }
+  .viz-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 4px;
+  }
+  .viz-subtitle {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin: 0 0 20px;
+  }
+
+  .bar-row {
+    display: grid;
+    grid-template-columns: 26px 88px 1fr 56px;
+    align-items: center;
+    column-gap: 10px;
+    height: 26px;
+    position: relative;
+  }
+  .bar-rank {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
+  .bar-label {
+    font-size: 13px;
+    color: var(--text-primary);
+    text-align: right;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .bar-track {
+    position: relative;
+    height: 24px;
+    background: transparent;
+  }
+  .bar-fill {
+    position: absolute;
+    left: 0;
+    top: 1px;
+    height: 22px;
+    border-radius: 4px;
+    background: var(--series-1);
+    transition: filter 0.12s ease;
+  }
+  .bar-row:hover .bar-fill {
+    filter: brightness(1.08);
+  }
+  .bar-row:hover {
+    cursor: pointer;
+  }
+  .bar-value {
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .bar-row.top .bar-fill { background: var(--series-1); }
+  .bar-row.top .bar-label,
+  .bar-row.top .bar-value { color: var(--text-primary); font-weight: 600; }
+
+  .axis-row {
+    display: grid;
+    grid-template-columns: 26px 88px 1fr 56px;
+    column-gap: 10px;
+    margin: 4px 0 8px;
+  }
+  .axis-spacer { grid-column: 1 / 3; }
+  .axis-ticks {
+    position: relative;
+    height: 16px;
+  }
+  .axis-tick {
+    position: absolute;
+    top: 0;
+    font-size: 11px;
+    color: var(--text-muted);
+    transform: translateX(-50%);
+  }
+  .axis-tick::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: -6px;
+    width: 1px;
+    height: 4px;
+    background: var(--gridline);
+  }
+
+  .gridline {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: var(--gridline);
+  }
+
+  .bars-wrap { position: relative; }
+
+  .tooltip {
+    position: fixed;
+    pointer-events: none;
+    background: var(--text-primary);
+    color: var(--surface-1);
+    font-size: 12px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    opacity: 0;
+    transition: opacity 0.1s ease;
+    z-index: 10;
+    white-space: nowrap;
+  }
+
+  .viz-footer {
+    margin-top: 18px;
+    padding-top: 12px;
+    border-top: 1px solid var(--gridline);
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+</style>
+</head>
+<body>
+
+<div class="viz-root">
+  <div class="viz-header">
+    <p class="viz-title">제주 카페 많은 동네 TOP 21 (0순위 ~ 20순위)</p>
+    <p class="viz-subtitle">행정동별 카페 수 · 소상공인시장진흥공단 상가정보 기준 (총 2,912곳)</p>
+  </div>
+
+  <div class="bars-wrap" id="chart"></div>
+
+  <div class="viz-footer">막대에 마우스를 올리면 정확한 카페 수를 볼 수 있어요.</div>
+</div>
+
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+  const data = [
+    {rank:0,dong:"애월읍",count:216},
+    {rank:1,dong:"구좌읍",count:186},
+    {rank:2,dong:"노형동",count:182},
+    {rank:3,dong:"이도2동",count:181},
+    {rank:4,dong:"조천읍",count:162},
+    {rank:5,dong:"한림읍",count:144},
+    {rank:6,dong:"아라동",count:130},
+    {rank:7,dong:"대정읍",count:125},
+    {rank:8,dong:"연동",count:114},
+    {rank:9,dong:"안덕면",count:114},
+    {rank:10,dong:"성산읍",count:109},
+    {rank:11,dong:"남원읍",count:92},
+    {rank:12,dong:"한경면",count:90},
+    {rank:13,dong:"표선면",count:71},
+    {rank:14,dong:"대륜동",count:66},
+    {rank:15,dong:"용담2동",count:51},
+    {rank:16,dong:"일도2동",count:51},
+    {rank:17,dong:"이도1동",count:51},
+    {rank:18,dong:"동홍동",count:48},
+    {rank:19,dong:"외도동",count:48},
+    {rank:20,dong:"오라동",count:43}
+  ];
+
+  const maxVal = Math.max(...data.map(d => d.count));
+  const niceMax = Math.ceil(maxVal / 50) * 50;
+  const ticks = [0, niceMax * 0.25, niceMax * 0.5, niceMax * 0.75, niceMax];
+
+  const chart = document.getElementById('chart');
+  const tooltip = document.getElementById('tooltip');
+
+  const axisRow = document.createElement('div');
+  axisRow.className = 'axis-row';
+  const axisSpacer = document.createElement('div');
+  axisSpacer.className = 'axis-spacer';
+  const axisTicks = document.createElement('div');
+  axisTicks.className = 'axis-ticks';
+  ticks.forEach(t => {
+    const tick = document.createElement('div');
+    tick.className = 'axis-tick';
+    tick.style.left = (t / niceMax * 100) + '%';
+    tick.textContent = Math.round(t).toLocaleString();
+    axisTicks.appendChild(tick);
+  });
+  axisRow.appendChild(axisSpacer);
+  axisRow.appendChild(axisTicks);
+  const axisValueSpacer = document.createElement('div');
+  axisRow.appendChild(axisValueSpacer);
+  chart.appendChild(axisRow);
+
+  data.forEach(d => {
+    const row = document.createElement('div');
+    row.className = 'bar-row' + (d.rank === 0 ? ' top' : '');
+
+    const rankEl = document.createElement('div');
+    rankEl.className = 'bar-rank';
+    rankEl.textContent = d.rank;
+
+    const labelEl = document.createElement('div');
+    labelEl.className = 'bar-label';
+    labelEl.textContent = d.dong;
+    labelEl.title = d.dong;
+
+    const trackEl = document.createElement('div');
+    trackEl.className = 'bar-track';
+    const fillEl = document.createElement('div');
+    fillEl.className = 'bar-fill';
+    fillEl.style.width = (d.count / niceMax * 100) + '%';
+    trackEl.appendChild(fillEl);
+
+    for (let i = 1; i < ticks.length; i++) {
+      const g = document.createElement('div');
+      g.className = 'gridline';
+      g.style.left = (ticks[i] / niceMax * 100) + '%';
+      trackEl.appendChild(g);
+    }
+
+    const valueEl = document.createElement('div');
+    valueEl.className = 'bar-value';
+    valueEl.textContent = d.count.toLocaleString() + '곳';
+
+    row.appendChild(rankEl);
+    row.appendChild(labelEl);
+    row.appendChild(trackEl);
+    row.appendChild(valueEl);
+
+    row.addEventListener('mousemove', (e) => {
+      tooltip.style.opacity = '1';
+      tooltip.textContent = `${d.rank}순위 · ${d.dong} · ${d.count.toLocaleString()}곳`;
+      tooltip.style.left = (e.clientX + 14) + 'px';
+      tooltip.style.top = (e.clientY - 30) + 'px';
+    });
+    row.addEventListener('mouseleave', () => {
+      tooltip.style.opacity = '0';
+    });
+
+    chart.appendChild(row);
+  });
+</script>
+</body>
+</html>
